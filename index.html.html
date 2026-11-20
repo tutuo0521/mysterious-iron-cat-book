@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>神秘的鐵貓｜互動繪本</title>
+<style>
+:root{--ink:#273044;--cream:#fff9ed;--gold:#e6b85c;--blue:#dceefa;--pink:#f8e2e4;--green:#e2f1df}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#f7ead8,#e8f1f3);font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;color:var(--ink)}
+main{max-width:900px;margin:24px auto;padding:16px}.book{background:var(--cream);border:5px solid white;border-radius:26px;box-shadow:0 15px 45px #43505a22;overflow:hidden}
+header{padding:18px 24px;background:#f2dfbd;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h1{font-size:clamp(24px,4vw,36px);margin:0}.small{font-size:14px;color:#596273}
+.page{padding:clamp(18px,4vw,36px);min-height:480px}.art{height:220px;border-radius:20px;background:linear-gradient(#cfe4ed,#f7d9ad);display:grid;place-items:center;position:relative;overflow:hidden;margin-bottom:20px}
+.cat{font-size:130px;filter:drop-shadow(0 8px 4px #3333);transition:.3s}.sparkle{position:absolute;font-size:30px;opacity:0;animation:twinkle 1.4s infinite alternate}.rain{position:absolute;inset:0;display:none;background:repeating-linear-gradient(105deg,transparent 0 20px,#ffffff99 21px 23px,transparent 24px 42px);animation:rain .4s linear infinite}
+@keyframes rain{to{background-position:0 40px}}@keyframes twinkle{to{opacity:1;transform:scale(1.2)}}
+h2{margin:8px 0 12px}p{line-height:1.8;font-size:17px}.actions,.levels{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+button{border:0;border-radius:14px;padding:12px 18px;font-size:16px;font-weight:700;cursor:pointer;background:#34445d;color:white}
+button.secondary{background:#e9e2d5;color:#273044}button:focus,input:focus,textarea:focus{outline:3px solid #e6b85c;outline-offset:2px}
+.level{flex:1;min-width:130px;color:#273044}.low{background:#dceefa}.mid{background:#f9edc9}.high{background:#f2dff2}
+.panel{background:white;border-radius:18px;padding:18px;margin-top:18px;border:1px solid #eee}.hidden{display:none}
+textarea{width:100%;min-height:78px;border:2px solid #d7dce2;border-radius:12px;padding:12px;font:inherit;font-size:16px}
+.feedback{background:#edf6e9;border-left:5px solid #75a86d;padding:14px;border-radius:10px;line-height:1.7;margin-top:14px}
+footer{padding:14px 24px;background:#f7eedf;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.pill{background:#fff;border-radius:30px;padding:7px 12px;font-size:13px}
+@media(max-width:600px){.page{min-height:520px}.art{height:180px}.cat{font-size:105px}}
+</style></head>
+<body><main><section class="book">
+<header><h1>🐾 神秘的鐵貓</h1><span class="pill" id="counter">封面</span></header>
+<div class="page">
+<div class="art" id="art"><div class="rain" id="rain"></div><span class="cat" id="cat">🐈‍⬛</span><span class="sparkle" id="spark">✨</span></div>
+<h2 id="title">森林裡的奇怪聲音</h2><p id="story">有一天，小安走進一座安靜的公園。遠方傳來「叮、叮」的聲音，好像有什麼東西正在風吹日曬中輕輕碰撞。</p>
+<div id="exploreStart" class="actions hidden"><button onclick="showExplore()">開始探索</button></div>
+<section id="explore" class="panel hidden">
+<strong>你想從哪個方向探索鐵貓？</strong>
+<div class="levels">
+<button class="level low" onclick="ask('low')">🔎 低階：外觀描述</button>
+<button class="level mid" onclick="ask('mid')">💡 中階：因果推論</button>
+<button class="level high" onclick="ask('high')">🎨 高階：美感想像</button>
+</div>
+<div id="questionArea" class="hidden">
+<h3 id="question"></h3><p class="small" id="hint"></p>
+<textarea id="answer" placeholder="把你的想法寫在這裡……"></textarea>
+<div class="actions"><button onclick="giveFeedback()">送出想法</button><button class="secondary" onclick="toggleHint()">給我提示</button><button class="secondary" onclick="document.getElementById('answer').value=''">重新回答</button></div>
+<div id="feedback" class="feedback hidden" aria-live="polite"></div>
+<div class="actions"><button class="secondary" onclick="showReporter()">完成，當小小解說員</button></div>
+</div></section>
+<section id="reporter" class="panel hidden"><h3>🎤 小小解說員</h3><p>請用自己的話介紹這隻鐵貓：</p><textarea id="report" placeholder="我發現這隻鐵貓……"></textarea><div class="actions"><button onclick="saveReport()">完成介紹</button></div><div id="reportDone" class="feedback hidden"></div></section>
+</div>
+<footer><button class="secondary" onclick="move(-1)">← 上一頁</button><span class="small" id="pageText">第 1 頁，共 4 頁</span><button onclick="move(1)">下一頁 →</button></footer>
+</section><p class="small" style="text-align:center">互動原型示範｜回饋採關鍵詞規則模擬，並非即時生成式 AI。</p></main>
+<script>
+const pages=[
+["森林裡的奇怪聲音","有一天，小安走進一座安靜的公園。遠方傳來「叮、叮」的聲音，好像有什麼東西正在風吹日曬中輕輕碰撞。","🌳"],
+["聲音的來源","小安循著聲音往前走，發現草叢旁有一個被藤蔓遮住的奇怪輪廓。它看起來像一隻動物，卻又和一般動物不太一樣。","🌿"],
+["神秘的鐵貓","撥開藤蔓後，小安看見一隻金屬製成的貓雕塑。它有尖尖的耳朵、圓圓的眼睛，身上帶著深色的痕跡。你會怎麼觀察這隻鐵貓？","🐈‍⬛"],
+["新的發現","小安仔細觀察鐵貓，發現每個人的想法都不一樣。有人注意到它的顏色，有人猜測它的故事，也有人想替它設計新的樣子。","🌟"]];
+let page=0,level='';
+function render(){document.getElementById('title').textContent=pages[page][0];document.getElementById('story').textContent=pages[page][1];document.getElementById('cat').textContent=pages[page][2];document.getElementById('counter').textContent=page===0?'封面':`第 ${page} 頁`;document.getElementById('pageText').textContent=`第 ${page+1} 頁，共 ${pages.length} 頁`;document.getElementById('exploreStart').classList.toggle('hidden',page!==2);document.getElementById('explore').classList.add('hidden');document.getElementById('reporter').classList.add('hidden');}
+function move(n){page=Math.max(0,Math.min(pages.length-1,page+n));render()}
+function showExplore(){document.getElementById('explore').classList.remove('hidden')}
+const qs={low:["你看到鐵貓有哪些顏色、形狀或細節？","提示：可以看看耳朵、眼睛和身體表面。"],mid:["你覺得這隻鐵貓為什麼會出現在這座公園？","提示：想想誰可能製作了它，以及它在這裡多久了。"],high:["如果讓你重新設計這隻鐵貓，你會增加什麼裝飾？為什麼？","提示：可以從顏色、材質、圖案或姿勢開始想像。"]};
+function ask(l){level=l;document.getElementById('questionArea').classList.remove('hidden');document.getElementById('question').textContent=qs[l][0];document.getElementById('hint').textContent='';document.getElementById('feedback').classList.add('hidden');document.getElementById('answer').value=''}
+function toggleHint(){document.getElementById('hint').textContent=qs[level][1]}
+function giveFeedback(){let a=document.getElementById('answer').value.trim();if(!a){alert('先寫下或說出你的想法吧！');return}let f='你願意分享自己的觀察，真棒！';if(/冰|涼|冷/.test(a))f='你觀察得很仔細！金屬常讓人感覺涼涼的。如果天空開始下雨，你覺得鐵貓表面會有什麼變化？';else if(/黑|灰|銀|亮|閃|光/.test(a))f='你注意到鐵貓的顏色與光線了！光照在金屬表面時可能會產生反光。你覺得不同角度看起來會一樣嗎？';else if(/雨|水|濕/.test(a))f='這個想法很有畫面！雨水落在鐵貓身上，可能讓表面看起來濕亮。你還能想像公園會出現什麼聲音嗎？';else if(level==='mid')f='這是一個有趣的推測！還有沒有其他可能？你可以想想製作者、時間或公園的故事。';else if(level==='high')f='你的想像很有創意！如果加入這個設計，它會讓鐵貓呈現什麼樣的個性？';document.getElementById('feedback').textContent=f;document.getElementById('feedback').classList.remove('hidden');if(/雨|水|濕/.test(a)){document.getElementById('rain').style.display='block'}if(/亮|閃|光|銀/.test(a)){document.getElementById('spark').style.opacity=1;document.getElementById('cat').style.filter='drop-shadow(0 0 18px #fff6a8)'} }
+function showReporter(){document.getElementById('reporter').classList.remove('hidden')}
+function saveReport(){let a=document.getElementById('report').value.trim();if(!a){alert('寫下一句你的介紹吧！');return}let d=document.getElementById('reportDone');d.textContent='完成啦！你的解說：「'+a+'」';d.classList.remove('hidden')}
+render();
+</script></body></html>
